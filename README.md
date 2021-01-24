@@ -20,5 +20,6 @@ For my initial prototype, I used a 'Raspberry Pi 3 b+' for the board, a 'HC-SR50
 ## General Improvements that could be made one day, by someone, maybe me, but likely not.
 - Add optional cli flags to make the PiCamera instance's settings configurable. 
 - Add optional cli flags to make the image taking configurable. For example, instead of taking a single image upon motion detection, user can specify bot to stream for some defined length of time upon motion detection.
+- Add optional cli flags to make how the bot stores images locally configurable.
 - This bot was hard configured to serve my purposes, which were to message me when teammates walk into my cube. However, if for some reason you wanted to message multiple slack users, you could add flags to allow multiple user ids to be used by the bot for sending images.
 - Add computer vision processing to the taken images and send additional meta data through slack message. Ex. Predicted number of faces in image.

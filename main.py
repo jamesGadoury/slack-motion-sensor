@@ -7,36 +7,45 @@ from slack_sdk import WebClient
 from gpiozero import MotionSensor
 from picamera import PiCamera
 
-FILE_NAME = "capture.jpg"
+FILE_NAME       = "capture.jpg"
+SLACK_BOT_TOKEN = os.environ['SLACK_BOT_TOKEN']
+SLACK_USER_ID   = os.environ['SLACK_USER_ID']
+MOTION_SENSOR_GPIO_PIN = os.environ['MOTION_SENSOR_GPIO_PIN']
 
 def send_user_message():
-	client = WebClient(token=os.environ['SLACK_BOT_TOKEN'])
-	response = client.chat_postMessage(
-		channel=f"@{os.environ['SLACK_USER_ID']}",
-		text="Motion Detected."
-	)
+	client = WebClient(token=SLACK_BOT_TOKEN)
 
-def send_user_message_with_img():
-	client = WebClient(token=os.environ['SLACK_BOT_TOKEN'])
+	try:
+		response = client.chat_postMessage(
+			channel=f"@{SLACK_USER_ID}",
+			text="Motion Detected."
+		)
+		
+	except SlackApiError as e:
+		print(f"Error uploading file: {e}")
+
+def send_user_message_with_img(image_file_name):
+	client = WebClient(token=SLACK_BOT_TOKEN)
+
 	try:
 		response = client.files_upload(
-			channels=f"@{os.environ['SLACK_USER_ID']}",
+			channels=f"@{SLACK_USER_ID}",
 			title="Motion Capture",
 			initial_comment="Motion Detected.",
-			file=FILE_NAME
+			file=image_file_name
 		)
 
 	except SlackApiError as e:
-		print("Error uploading file: {}".format(e))
+		print(f"Error uploading file: {e}")
 
 def take_picture_and_send_to_user():
 	with PiCamera() as camera:
 		camera.capture(FILE_NAME)
-		send_user_message_with_img()
+		send_user_message_with_img(FILE_NAME)
 
 def main_loop(usingCamera = False):
 	try:
-		pir = MotionSensor(os.environ['MOTION_SENSOR_GPIO_PIN'])
+		pir = MotionSensor(MOTION_SENSOR_GPIO_PIN)
 
 		if usingCamera:
 			motion_callback = take_picture_and_send_to_user
